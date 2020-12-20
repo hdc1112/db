@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 namespace {
-TEST(GTestSanityTest, TrivialTest) {
+TEST(GTestSanityTest, SanityTest) {
     ASSERT_EQ(1, 1);
 }
 }

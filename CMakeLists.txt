@@ -5,9 +5,9 @@ set(CMAKE_CXX_STANDARD 20)
 
 include(cmake/third-party.cmake)
 
-enable_testing()
+FILE(GLOB SRC_FILES src/main/**.cpp src/main/**.hpp)
 
-add_executable(unit_tests
-        src/main/Page.hpp
-        src/test/unit_tests_main.cpp)
-target_link_libraries(unit_tests fmt::fmt ${GTEST_LIBRARIES})
+FILE(GLOB UNIT_TEST_SRC_FILES src/test/**.cpp src/test/**.hpp)
+
+add_executable(unit_test ${SRC_FILES} ${UNIT_TEST_SRC_FILES})
+target_link_libraries(unit_test fmt::fmt ${GTEST_LIBRARIES})
