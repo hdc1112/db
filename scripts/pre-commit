@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+if [ -f .git/MERGE_HEAD ]; then
+  echo "Skipping clang-format because we are in a merge process"
+  exit 0
+fi
+
+echo "Running clang-format"
+
+modified_files=$(git diff-index --cached --name-only HEAD)
+for modified_file in $modified_files; do
+  if [[ -f $modified_file ]]; then
+    ./scripts/clang-format-wrapper.sh $modified_file || {
+      exit 1
+    }
+    git add $modified_file
+  fi
+done
