@@ -22,9 +22,9 @@ cd build
 cmake ..
 cd $path/..
 
-echo Checking files $@ ...
+echo Checking files "$@" ...
 
-for file in $@; do
+for file in "$@"; do
   $clang_tidy_bin -p build $file
 done
 
