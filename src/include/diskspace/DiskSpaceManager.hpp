@@ -1,7 +1,7 @@
 #pragma once
 
+#include "TypeAlias.hpp"
 #include "diskspace/DiskSpaceConstants.hpp"
-#include "diskspace/DiskSpaceTypes.hpp"
 
 #include <string>
 

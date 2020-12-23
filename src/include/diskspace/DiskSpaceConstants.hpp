@@ -1,6 +1,6 @@
 #pragma once
 
-#include "diskspace/DiskSpaceTypes.hpp"
+#include "TypeAlias.hpp"
 
 namespace diskspace {
 constexpr BlockNum defaultBlockNum = 10;

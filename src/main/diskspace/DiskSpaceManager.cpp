@@ -1,6 +1,5 @@
 #include "diskspace/DiskSpaceManager.hpp"
 #include "ErrCode.hpp"
-#include "diskspace/DiskSpaceTypes.hpp"
 #include "utility/FileUtility.hpp"
 
 namespace diskspace {
