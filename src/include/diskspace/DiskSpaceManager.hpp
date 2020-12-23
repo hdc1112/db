@@ -5,9 +5,9 @@
 
 #include <string>
 
-namespace disk {
-bool createNewDatabaseFile(const std::string& pathToFile,
-                           BlockNum blockNum = defaultBlockNum,
-                           BlockBytes blockBytes = defaultBlockBytes,
-                           bool fillZero = false);
+namespace diskspace {
+bool createNewFile(const std::string& pathToFile,
+                   BlockNum blockNum = defaultBlockNum,
+                   BlockBytes blockBytes = defaultBlockBytes,
+                   bool fillZero = false);
 }

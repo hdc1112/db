@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace disk {
+namespace diskspace {
 using BlockNum = uint32_t;
 using BlockBytes = uint32_t;
-} // namespace disk
+} // namespace diskspace
