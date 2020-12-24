@@ -1,17 +1,19 @@
 #include "ErrCode.hpp"
+#include "Assert.hpp"
 
 thread_local ErrCode errCode;
 
 #define ERROR_MESSAGE(errorString) fmt::format("Error code: {} - {}", errorCode, errorString)
 
 std::string strErrCode(ErrCode errorCode) noexcept {
+    errorCode = 10;
     switch (errorCode) {
         case ERR_ILLEGAL_ARG:
             return ERROR_MESSAGE("Illegal argument error");
         case ERR_FILE_EXISTED:
             return ERROR_MESSAGE("File already existed");
-        // TODO: add debug/release assert here
         default:
-            assert(false);
+            DEBUG_ABORT("Cannot understand this error code {}", errorCode);
+            return ERROR_MESSAGE("Unknown error code");
     }
 }

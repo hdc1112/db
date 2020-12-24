@@ -1,0 +1,16 @@
+set(DEBUG_ASSERT_CRASH_IF_FAIL true)
+set(RELEASE_ASSERT_CRASH_IF_FAIL false)
+
+if (NOT FLAVOR)
+    set(FLAVOR "DEBUG")
+endif()
+
+if (FLAVOR STREQUAL "DEBUG")
+    set(DEBUG_ASSERT_CRASH_IF_FAIL true)
+    set(RELEASE_ASSERT_CRASH_IF_FAIL true)
+elseif (FLAVOR STREQUAL "RELEASE")
+    set(DEBUG_ASSERT_CRASH_IF_FAIL false)
+    set(RELEASE_ASSERT_CRASH_IF_FAIL true)
+else()
+    message(FATAL_ERROR "Invalid flavor: [${FLAVOR}]")
+endif()
