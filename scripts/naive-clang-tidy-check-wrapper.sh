@@ -17,6 +17,7 @@ cd $path/..
 
 source $path/file-utility.sh
 
+# TODO: this code does not work if in main branch
 git diff --name-only HEAD main | \
   while read modified_file; do
     if match_source_file_extension "$modified_file" && [ -f "$modified_file" ]; then
