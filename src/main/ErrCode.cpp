@@ -6,7 +6,6 @@ thread_local ErrCode errCode;
 #define ERROR_MESSAGE(errorString) fmt::format("Error code: {} - {}", errorCode, errorString)
 
 std::string strErrCode(ErrCode errorCode) noexcept {
-    errorCode = 10;
     switch (errorCode) {
         case ERR_ILLEGAL_ARG:
             return ERROR_MESSAGE("Illegal argument error");
