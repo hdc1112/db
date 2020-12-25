@@ -6,7 +6,7 @@
 
 namespace utils {
 inline void printBuildFlags() {
-    spdlog::info("kDebugAssertCrashIfFail: {}", kDebugAssertCrashIfFail);
-    spdlog::info("kReleaseAssertCrashIfFail: {}", kReleaseAssertCrashIfFail);
+    SPDLOG_INFO("kDebugAssertCrashIfFail: {}", kDebugAssertCrashIfFail);
+    SPDLOG_INFO("kReleaseAssertCrashIfFail: {}", kReleaseAssertCrashIfFail);
 }
 } // namespace utils

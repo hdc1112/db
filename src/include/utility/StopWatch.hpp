@@ -5,7 +5,7 @@
 namespace utils {
 template<typename Clock>
 class StopWatchGeneric {
-    using duration = typename Clock::Duration;
+    using duration = typename Clock::duration;
     using time_point = typename Clock::time_point;
 
 public:
@@ -34,7 +34,21 @@ public:
     }
 
     duration elapsed() const {
-        return _elapsedTotal + (_running ? fromStart() : 0);
+        auto elapsedDuration = _elapsedTotal;
+
+        if (_running) {
+            elapsedDuration += fromStart();
+        }
+
+        return elapsedDuration;
+    }
+
+    std::chrono::milliseconds elapsedMs() const {
+        return std::chrono::duration_cast<std::chrono::milliseconds>(elapsed());
+    }
+
+    std::chrono::seconds elapsedSeconds() const {
+        return std::chrono::duration_cast<std::chrono::seconds> > (elapsed());
     }
 
 private:
