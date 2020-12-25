@@ -6,8 +6,7 @@
 #include <string>
 
 namespace diskspace {
-bool createNewFile(const std::string& pathToFile,
+bool createNewFile(const char* fileName,
                    BlockNum blockNum = defaultBlockNum,
-                   BlockBytes blockBytes = defaultBlockBytes,
-                   bool fillZero = false);
+                   BlockBytes blockBytes = defaultBlockBytes);
 }
