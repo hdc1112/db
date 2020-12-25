@@ -26,7 +26,10 @@ bool createNewFile(const char* fileName, BlockNum blockNum, BlockBytes blockByte
 #ifdef __APPLE__
     spdlog::info("Take the Apple system code path to create a new file");
 
-    int fd = open(fileName, O_CREAT | O_WRONLY);
+    int oflag = O_CREAT | O_WRONLY | O_TRUNC;
+    mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+
+    int fd = open(fileName, oflag, mode);
     if (fd == -1) {
         errCode = ERR_UNCATEGORIZED;
         return false;
@@ -56,7 +59,7 @@ bool createNewFile(const char* fileName, BlockNum blockNum, BlockBytes blockByte
 
     return true;
 #else
-    spdlog::critical("Unsupported operating system");
+    SPDLOG_CRITICAL("Unsupported operating system");
     errCode = ERR_UNSUPPORTED_OS;
     return false;
 #endif

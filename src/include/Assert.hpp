@@ -9,7 +9,7 @@
 #define DEBUG_ASSERT(flag, fmt, ...)                                                                                   \
     do {                                                                                                               \
         if (!(flag)) {                                                                                                 \
-            spdlog::error(fmt, ##__VA_ARGS__);                                                                         \
+            SPDLOG_ERROR(fmt, ##__VA_ARGS__);                                                                          \
             if (kDebugAssertCrashIfFail) {                                                                             \
                 assert(false);                                                                                         \
                 std::terminate();                                                                                      \
@@ -22,7 +22,7 @@
 #define RELEASE_ASSERT(flag, fmt, ...)                                                                                 \
     do {                                                                                                               \
         if (!(flag)) {                                                                                                 \
-            spdlog::critical(fmt, ##__VA_ARGS__);                                                                      \
+            SPDLOG_CRITICAL(fmt, ##__VA_ARGS__);                                                                       \
             if (kReleaseAssertCrashIfFail) {                                                                           \
                 assert(false);                                                                                         \
                 std::terminate();                                                                                      \
