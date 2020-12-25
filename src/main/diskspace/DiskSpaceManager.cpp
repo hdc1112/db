@@ -24,14 +24,14 @@ bool createNewFile(const char* fileName, BlockNum blockNum, BlockBytes blockByte
     errCode = ERR_NO_ERROR;
 
 #ifdef __APPLE__
-    spdlog::info("Take the Apple system code path to create a new file");
+    SPDLOG_INFO("Take the Apple system code path to create a new file");
 
     int oflag = O_CREAT | O_WRONLY | O_TRUNC;
     mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 
     int fd = open(fileName, oflag, mode);
     if (fd == -1) {
-        errCode = ERR_UNCATEGORIZED;
+        errCode = errnoToErrCode(errno);
         return false;
     }
 
@@ -46,13 +46,13 @@ bool createNewFile(const char* fileName, BlockNum blockNum, BlockBytes blockByte
 
     int ret = fcntl(fd, F_GLOBAL_NOCACHE, 1);
     if (ret == -1) {
-        errCode = ERR_UNCATEGORIZED;
+        errCode = errnoToErrCode(errno);
         return false;
     }
 
     for (BlockNum i = 0; i < blockNum; ++i) {
         if (ret = write(fd, block.data(), blockBytes); ret != blockBytes) {
-            errCode = ERR_UNCATEGORIZED;
+            errCode = errnoToErrCode(errno);
             return false;
         }
     }

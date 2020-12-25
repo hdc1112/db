@@ -12,7 +12,7 @@ namespace {
 TEST(PerfTestSanityTest, stopWatch) {
     utils::StopWatch stopWatch;
     stopWatch.start();
-    std::this_thread::sleep_for(1234ms);
+    std::this_thread::sleep_for(123ms);
     stopWatch.stop();
     SPDLOG_INFO("Elapsed millis {}", stopWatch.elapsedMs().count());
 }
