@@ -7,10 +7,10 @@ namespace utils {
 template<typename T>
 class BlockingQueue {
 public:
-    template<typename E>
-    void enqueue(E&& element) {
+    template<typename... Args>
+    void enqueue(Args&&... args) {
         std::lock_guard<std::mutex> lock(_mutex);
-        _queue.emplace(std::forward<E>(element));
+        _queue.emplace(std::forward<Args>(args)...);
         _condition.notify_all();
     }
 
