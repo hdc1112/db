@@ -1,29 +1,58 @@
 #include "ErrCode.hpp"
 #include "diskspace/DiskSpaceManager.hpp"
 
-#include "spdlog/spdlog.h"
 #include "gtest/gtest.h"
+
+#include "FutureTestUtility.hpp"
 
 namespace diskspace {
 namespace {
-TEST(DiskSpaceManagerTest, fileExisted) {
+
+using ::testing::Test;
+
+class DiskSpaceManagerTest : public Test {
+public:
+    void SetUp() override {
+        diskSpaceManager = new DiskSpaceManager();
+        diskSpaceManager->start();
+    }
+
+    void TearDown() override {
+        WAIT_FOR(diskSpaceManager->stop());
+        delete diskSpaceManager;
+        diskSpaceManager = nullptr;
+    }
+
+    DiskSpaceManager* diskSpaceManager = nullptr;
+};
+
+TEST_F(DiskSpaceManagerTest, fileExisted) {
     char tmpFileName[]{"/tmp/db-tmpfile.XXXXXX"};
     mkstemp(tmpFileName);
-    bool created = createNewFile(tmpFileName);
-    EXPECT_FALSE(created);
+
+    CreateFileCommand createFileCommand(tmpFileName);
+    auto future = diskSpaceManager->submit(createFileCommand);
+    WAIT_FOR(future);
+    auto [success, errCode] = future.get();
+
+    EXPECT_FALSE(success);
     EXPECT_EQ(ERR_FILE_EXISTED, errCode);
-    if (!created) {
-        spdlog::error("Cannot create new file {}, the error is {}", tmpFileName, strErrCode(errCode));
-    }
+
     unlink(tmpFileName);
 }
 
-TEST(DiskSpaceManagerTest, createNewFile) {
+TEST_F(DiskSpaceManagerTest, createNewFile) {
     char tmpFileName[]{"/tmp/db-tmpfile.kznwMh"};
     unlink(tmpFileName);
 
-    bool created = createNewFile(tmpFileName, 1, 1024);
-    EXPECT_TRUE(created);
+    CreateFileCommand createFileCommand(tmpFileName);
+    auto future = diskSpaceManager->submit(createFileCommand);
+    WAIT_FOR(future);
+    auto [success, errCode] = future.get();
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(ERR_NO_ERROR, errCode);
+
     unlink(tmpFileName);
 }
 } // namespace

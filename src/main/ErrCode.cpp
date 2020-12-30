@@ -28,6 +28,8 @@ std::string strErrCode(ErrCode errorCode) noexcept {
             return ERROR_MESSAGE("Error I/O");
         case ERR_UNCATEGORIZED:
             return ERROR_MESSAGE("Uncategorized error");
+        case ERR_SERVICE_UNAVAILABLE:
+            return ERROR_MESSAGE("Unavailable service");
         default:
             DEBUG_ABORT("Cannot understand this error code {}", errorCode);
             return ERROR_MESSAGE("Unknown error code");
