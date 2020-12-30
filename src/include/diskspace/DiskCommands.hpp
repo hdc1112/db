@@ -14,25 +14,32 @@ struct CreateFileCommand {
 };
 
 struct RemoveFileCommand {
+    explicit RemoveFileCommand(const char* fileName) : fileName(fileName) {}
     const char* fileName;
 };
 
 struct AppendBlockCommand {
+    AppendBlockCommand(const char* fileName, BlockBytes bytes, const uint8_t* const from)
+        : fileName(fileName), bytes(bytes), from(from) {}
     const char* fileName;
     BlockBytes bytes;
-    const uint8_t* from;
+    const uint8_t* const from;
 };
 
 struct WriteBlockCommand {
+    WriteBlockCommand(const char* fileName, BlockId blockId, BlockBytes bytes, const uint8_t* const from)
+        : fileName(fileName), blockId(blockId), bytes(bytes), from(from) {}
     const char* fileName;
-    BlockNum blockId;
+    BlockId blockId;
     BlockBytes bytes;
     const uint8_t* const from;
 };
 
 struct ReadBlockCommannd {
+    ReadBlockCommannd(const char* fileName, BlockId blockId, BlockBytes bytes, uint8_t* const to)
+        : fileName(fileName), blockId(blockId), bytes(bytes), to(to) {}
     const char* fileName;
-    BlockNum blockId;
+    BlockId blockId;
     BlockBytes bytes;
     uint8_t* const to;
 };

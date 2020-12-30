@@ -196,15 +196,15 @@ void DiskSpaceManager::transferState(DiskIOThreadState expectCurrentState, DiskI
     _state = newState;
 }
 
-std::future<DiskCommandReport> DiskSpaceManager::submit(const DiskCommand& diskCommand) {
-    std::promise<DiskCommandReport> reportPromise;
+std::future<DiskCommandResult> DiskSpaceManager::submit(const DiskCommand& diskCommand) {
+    std::promise<DiskCommandResult> reportPromise;
     auto reportFuture = reportPromise.get_future();
     submit(DiskCommandsGroup({diskCommand}, std::move(reportPromise)));
     return reportFuture;
 }
 
-std::future<DiskCommandReport> DiskSpaceManager::submit(const std::vector<DiskCommand>& diskCommands) {
-    std::promise<DiskCommandReport> reportPromise;
+std::future<DiskCommandResult> DiskSpaceManager::submit(const std::vector<DiskCommand>& diskCommands) {
+    std::promise<DiskCommandResult> reportPromise;
     auto reportFuture = reportPromise.get_future();
     submit(DiskCommandsGroup(diskCommands, std::move(reportPromise)));
     return reportFuture;
@@ -244,6 +244,34 @@ void DiskSpaceManager::run() {
     }
     transferState(DiskIOThreadState::Stopping, DiskIOThreadState::Stopped);
     _stopPromise.set_value();
+}
+
+std::future<DiskCommandResult> createFile(DiskSpaceManager* diskSpaceManager, const char* fileName) {
+    return diskSpaceManager->submit(CreateFileCommand(fileName));
+}
+
+std::future<DiskCommandResult> removeFile(DiskSpaceManager* diskSpaceManager, const char* fileName) {
+    return diskSpaceManager->submit(RemoveFileCommand(fileName));
+}
+
+std::future<DiskCommandResult> appendBlock(DiskSpaceManager* diskSpaceManager,
+                                           const char* fileName,
+                                           BlockBytes bytes,
+                                           const uint8_t* const from) {
+    return diskSpaceManager->submit(AppendBlockCommand(fileName, bytes, from));
+}
+
+std::future<DiskCommandResult> writeBlock(DiskSpaceManager* diskSpaceManager,
+                                          const char* fileName,
+                                          BlockId blockId,
+                                          BlockBytes bytes,
+                                          const uint8_t* const from) {
+    return diskSpaceManager->submit(WriteBlockCommand(fileName, blockId, bytes, from));
+}
+
+std::future<DiskCommandResult> readBlock(
+    DiskSpaceManager* diskSpaceManager, const char* fileName, BlockId blockId, BlockBytes bytes, uint8_t* const to) {
+    return diskSpaceManager->submit(ReadBlockCommannd(fileName, blockId, bytes, to));
 }
 
 } // namespace diskspace

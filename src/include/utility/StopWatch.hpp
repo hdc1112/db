@@ -43,11 +43,11 @@ public:
         return elapsedDuration;
     }
 
-    std::chrono::milliseconds elapsedMs() const {
+    [[nodiscard]] std::chrono::milliseconds elapsedMs() const {
         return std::chrono::duration_cast<std::chrono::milliseconds>(elapsed());
     }
 
-    std::chrono::seconds elapsedSeconds() const {
+    [[nodiscard]] std::chrono::seconds elapsedSeconds() const {
         return std::chrono::duration_cast<std::chrono::seconds> > (elapsed());
     }
 

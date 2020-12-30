@@ -41,9 +41,9 @@ public:
         if (_queue.empty()) {
             return std::nullopt;
         } else {
-            auto ret = std::make_optional(std::move(_queue.front()));
+            auto ret = std::move(_queue.front());
             _queue.pop();
-            return ret;
+            return std::move(ret);
         }
     }
 

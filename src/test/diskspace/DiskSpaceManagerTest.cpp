@@ -30,8 +30,7 @@ TEST_F(DiskSpaceManagerTest, fileExisted) {
     char tmpFileName[]{"/tmp/db-tmpfile.XXXXXX"};
     mkstemp(tmpFileName);
 
-    CreateFileCommand createFileCommand(tmpFileName);
-    auto future = diskSpaceManager->submit(createFileCommand);
+    auto future = createFile(diskSpaceManager, tmpFileName);
     WAIT_FOR(future);
     auto [success, errCode] = future.get();
 
@@ -45,8 +44,7 @@ TEST_F(DiskSpaceManagerTest, createNewFile) {
     char tmpFileName[]{"/tmp/db-tmpfile.kznwMh"};
     unlink(tmpFileName);
 
-    CreateFileCommand createFileCommand(tmpFileName);
-    auto future = diskSpaceManager->submit(createFileCommand);
+    auto future = createFile(diskSpaceManager, tmpFileName);
     WAIT_FOR(future);
     auto [success, errCode] = future.get();
 
