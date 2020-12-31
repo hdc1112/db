@@ -1,11 +1,9 @@
 #pragma once
 
-#include "TypeAlias.hpp"
-
-#include "fmt/format.h"
-
 #include <cassert>
+#include <string>
 
+using ErrCode = unsigned short;
 extern thread_local ErrCode errCode;
 
 constexpr short ERR_NO_ERROR = 0;

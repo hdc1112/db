@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ErrCode.hpp"
-#include "TypeAlias.hpp"
 #include "diskspace/DiskCommands.hpp"
+#include "diskspace/DiskSpaceTypes.hpp"
 #include "utility/BlockingQueue.hpp"
 
 #include "spdlog/spdlog.h"

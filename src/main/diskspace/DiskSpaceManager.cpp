@@ -16,19 +16,22 @@
 
 namespace diskspace {
 bool processCreateFileDiskCommand(const CreateFileCommand& createFileCommand) {
-    SPDLOG_INFO("Processing create file command {}", createFileCommand);
-
     const char* fileName = createFileCommand.fileName;
     if (utils::exists(fileName)) {
         errCode = ERR_FILE_EXISTED;
         return false;
     }
 
-    int oflag = O_CREAT | O_TRUNC;
+    int oflag = O_CREAT | O_RDWR | O_TRUNC | O_EXCL;
     mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 
     int fd = open(fileName, oflag, mode);
     if (fd == -1) {
+        errCode = errnoToErrCode(errno);
+        return false;
+    }
+
+    if (int ret = fcntl(fd, F_GLOBAL_NOCACHE, 1); ret == -1) {
         errCode = errnoToErrCode(errno);
         return false;
     }
@@ -42,8 +45,6 @@ bool processCreateFileDiskCommand(const CreateFileCommand& createFileCommand) {
 }
 
 bool processRemoveFileDiskCommand(const RemoveFileCommand& removeFileCommand) {
-    SPDLOG_INFO("Processing remove file command {}", removeFileCommand);
-
     const char* fileName = removeFileCommand.fileName;
     if (int ret = unlink(fileName); ret == -1) {
         errCode = errnoToErrCode(errno);
@@ -53,11 +54,9 @@ bool processRemoveFileDiskCommand(const RemoveFileCommand& removeFileCommand) {
 }
 
 bool processAppendBlockCommand(const AppendBlockCommand& appendBlockCommand) {
-    SPDLOG_INFO("Processing append block command {}", appendBlockCommand);
-
     auto [fileName, bytes, from] = appendBlockCommand;
 
-    int oflag = O_APPEND;
+    int oflag = O_WRONLY | O_APPEND;
     int fd = open(fileName, oflag);
     if (fd == -1) {
         errCode = errnoToErrCode(errno);
@@ -84,8 +83,6 @@ bool processAppendBlockCommand(const AppendBlockCommand& appendBlockCommand) {
 }
 
 bool processWriteBlockCommand(const WriteBlockCommand& writeBlockCommand) {
-    SPDLOG_INFO("Processing write block command {}", writeBlockCommand);
-
     auto [fileName, blockId, bytes, from] = writeBlockCommand;
 
     int oflag = O_WRONLY;
@@ -120,8 +117,6 @@ bool processWriteBlockCommand(const WriteBlockCommand& writeBlockCommand) {
 }
 
 bool processReadBlockCommand(const ReadBlockCommannd& readBlockCommannd) {
-    SPDLOG_INFO("Processing read block command {}", readBlockCommannd);
-
     auto [fileName, blockId, bytes, to] = readBlockCommannd;
 
     int oflag = O_RDONLY;
@@ -234,7 +229,11 @@ void DiskSpaceManager::run() {
         bool commandsSuccess = true;
         ErrCode commandsErrCode = ERR_NO_ERROR;
         for (auto diskCommand : diskCommandsGroup->diskCommands) {
-            if (bool success = processDiskCommand(diskCommand); !success) {
+            SPDLOG_INFO("Process disk command: {}", diskCommand);
+            bool success = processDiskCommand(diskCommand);
+            SPDLOG_INFO("Disk command result: Success = {} {}", success, success ? "" : strErrCode(errCode));
+
+            if (!success) {
                 commandsSuccess = false;
                 commandsErrCode = errCode;
                 break;

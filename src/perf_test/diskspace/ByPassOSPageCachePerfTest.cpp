@@ -1,4 +1,5 @@
 #include "ErrCode.hpp"
+#include "diskspace/DiskSpaceTypes.hpp"
 #include "utility/FileUtility.hpp"
 #include "utility/ScopeGuard.hpp"
 #include "utility/StopWatch.hpp"
@@ -107,7 +108,7 @@ bool readFile(const char* fileName, BlockNum blockNum, BlockBytes blockBytes, bo
 
 TEST(ByPassOSPageCachePerfTest, readDataFromMemory) {
     BlockNum blockNum = 1024;
-    BlockBytes blockBytes = 1024 * 1024;
+    BlockBytes blockBytes = 1_MB;
     auto* from = new uint8_t[blockNum * blockBytes];
     auto* to = new uint8_t[blockNum * blockBytes];
 
@@ -125,7 +126,7 @@ TEST(ByPassOSPageCachePerfTest, readFile_WithPageCache) {
     unlink(tmpFileName);
 
     BlockNum blockNum = 1024;
-    BlockBytes blockBytes = 1024 * 1024;
+    BlockBytes blockBytes = 1_MB;
     bool created = createNewFile(tmpFileName, blockNum, blockBytes);
     ASSERT_TRUE(created);
 
@@ -150,7 +151,7 @@ TEST(ByPassOSPageCachePerfTest, readFile_WithoutPageCache) {
     unlink(tmpFileName);
 
     BlockNum blockNum = 1024;
-    BlockBytes blockBytes = 1024 * 1024;
+    BlockBytes blockBytes = 1_MB;
     bool created = createNewFile(tmpFileName, blockNum, blockBytes);
     ASSERT_TRUE(created);
 
