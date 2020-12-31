@@ -32,6 +32,7 @@ private:
     };
 
     enum class DiskIOThreadState : short { Open, Running, Stopping, Stopped };
+    friend std::ostream& operator<<(std::ostream& os, const DiskIOThreadState& diskIoThreadState);
 
     void submit(DiskCommandsGroup diskCommandsGroup);
 

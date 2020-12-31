@@ -40,7 +40,8 @@ public:
         RemoveFile(diskSpaceManager, fromTmpFileName);
         RemoveFile(diskSpaceManager, toTmpFileName);
 
-        WAIT_FOR(diskSpaceManager->stop());
+        auto future = diskSpaceManager->stop();
+        WAIT_FOR(future);
         delete diskSpaceManager;
         diskSpaceManager = nullptr;
     }
@@ -115,7 +116,7 @@ TEST_P(DoubleBufferingPerfTestFixture, TreatmentGroup_DoubleBuffering_CPU_IO_Par
     stopWatch.start();
 
     std::future<DiskCommandResult> fromFuture0 = readBlock(diskSpaceManager, fromTmpFileName, 0, bytes, from0);
-    std::future<DiskCommandResult> fromFuture1;
+    std::future<DiskCommandResult> fromFuture1 = completedFuture<DiskCommandResult>();
     std::future<DiskCommandResult> toFuture0 = completedFuture<DiskCommandResult>();
     std::future<DiskCommandResult> toFuture1 = completedFuture<DiskCommandResult>();
 
@@ -123,6 +124,8 @@ TEST_P(DoubleBufferingPerfTestFixture, TreatmentGroup_DoubleBuffering_CPU_IO_Par
         if (i % 2 == 0) {
             WAIT_FOR(fromFuture0);
             WAIT_FOR(toFuture0);
+            ASSERT_TRUE(fromFuture0.get().success);
+            ASSERT_TRUE(toFuture0.get().success);
 
             if (i + 1 < blocks) {
                 fromFuture1 = readBlock(diskSpaceManager, fromTmpFileName, i + 1, bytes, from1);
@@ -136,6 +139,8 @@ TEST_P(DoubleBufferingPerfTestFixture, TreatmentGroup_DoubleBuffering_CPU_IO_Par
         } else {
             WAIT_FOR(fromFuture1);
             WAIT_FOR(toFuture1);
+            ASSERT_TRUE(fromFuture1.get().success);
+            ASSERT_TRUE(toFuture1.get().success);
 
             if (i + 1 < blocks) {
                 fromFuture0 = readBlock(diskSpaceManager, fromTmpFileName, i + 1, bytes, from0);
@@ -148,6 +153,24 @@ TEST_P(DoubleBufferingPerfTestFixture, TreatmentGroup_DoubleBuffering_CPU_IO_Par
             toFuture1 = appendBlock(diskSpaceManager, toTmpFileName, bytes, to1);
         }
     }
+
+    if (fromFuture0.valid()) {
+        WAIT_FOR(fromFuture0);
+        ASSERT_TRUE(fromFuture0.get().success);
+    }
+    if (toFuture0.valid()) {
+        WAIT_FOR(toFuture0);
+        ASSERT_TRUE(toFuture0.get().success);
+    }
+    if (fromFuture1.valid()) {
+        WAIT_FOR(fromFuture1);
+        ASSERT_TRUE(fromFuture1.get().success);
+    }
+    if (toFuture1.valid()) {
+        WAIT_FOR(toFuture1);
+        ASSERT_TRUE(toFuture1.get().success);
+    }
+
     stopWatch.stop();
     SPDLOG_INFO("Double Buffering {} blocks {} bytes per block, takes time millis {}",
                 blocks,

@@ -18,7 +18,8 @@ public:
     }
 
     void TearDown() override {
-        WAIT_FOR(diskSpaceManager->stop());
+        auto future = diskSpaceManager->stop();
+        WAIT_FOR(future);
         delete diskSpaceManager;
         diskSpaceManager = nullptr;
     }

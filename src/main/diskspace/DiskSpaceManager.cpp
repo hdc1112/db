@@ -186,8 +186,12 @@ std::future<void> DiskSpaceManager::stop() {
 }
 
 void DiskSpaceManager::transferState(DiskIOThreadState expectCurrentState, DiskIOThreadState newState) {
-    DEBUG_ASSERT(_state == expectCurrentState, "Current actual state {}, expected state{}", _state, expectCurrentState);
-    SPDLOG_INFO("Disk thread state updated from {} to {}", _state, newState);
+    DiskIOThreadState actualCurrentState = _state;
+    SPDLOG_INFO("Updating disk thread state from {} to {}", expectCurrentState, newState);
+    DEBUG_ASSERT(expectCurrentState == actualCurrentState,
+                 "Current expected state {}, actual state {}",
+                 expectCurrentState,
+                 actualCurrentState);
     _state = newState;
 }
 
@@ -243,6 +247,26 @@ void DiskSpaceManager::run() {
     }
     transferState(DiskIOThreadState::Stopping, DiskIOThreadState::Stopped);
     _stopPromise.set_value();
+}
+
+std::ostream& operator<<(std::ostream& os, const DiskSpaceManager::DiskIOThreadState& diskIoThreadState) {
+    switch (diskIoThreadState) {
+        case DiskSpaceManager::DiskIOThreadState::Open:
+            os << "Open";
+            break;
+        case DiskSpaceManager::DiskIOThreadState::Running:
+            os << "Running";
+            break;
+        case DiskSpaceManager::DiskIOThreadState::Stopping:
+            os << "Stopping";
+            break;
+        case DiskSpaceManager::DiskIOThreadState::Stopped:
+            os << "Stopped";
+            break;
+        default:
+            RELEASE_ABORT("Illegal disk io thread state");
+    }
+    return os;
 }
 
 std::future<DiskCommandResult> createFile(DiskSpaceManager* diskSpaceManager, const char* fileName) {
