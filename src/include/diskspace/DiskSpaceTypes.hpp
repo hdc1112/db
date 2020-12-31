@@ -14,6 +14,7 @@ using BlockId = uint32_t;
 using BlockBytes = uint32_t;
 
 struct DiskCommandResult {
+    DiskCommandResult() : success(true), errCode(ERR_NO_ERROR) {}
     DiskCommandResult(bool success, ErrCode errCode) : success(success), errCode(errCode) {}
     bool success;
     ErrCode errCode;

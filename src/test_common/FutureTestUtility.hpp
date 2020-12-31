@@ -4,6 +4,9 @@
 
 #include "TestParameters.hpp"
 
+#include <future>
+#include <type_traits>
+
 #define WAIT_FOR(future)                                                                                               \
     do {                                                                                                               \
         if (future.wait_for(g_waitForMillis) != std::future_status::ready) {                                           \
@@ -11,15 +14,9 @@
         }                                                                                                              \
     } while (false)
 
-#define WAIT_DISK_CMD(runCommand)                                                                                      \
-    do {                                                                                                               \
-        auto future = (runCommand);                                                                                    \
-        WAIT_FOR(future);                                                                                              \
-    } while (false)
-
-#define WAIT_DISK_CMD_AND_ASSERT(runCommand)                                                                           \
-    do {                                                                                                               \
-        auto future = (runCommand);                                                                                    \
-        WAIT_FOR(future);                                                                                              \
-        ASSERT_TRUE(future.get().success);                                                                             \
-    } while (false)
+template<typename T>
+inline std::future<T> completedFuture() {
+    std::promise<T> promise;
+    promise.set_value(T());
+    return promise.get_future();
+}
