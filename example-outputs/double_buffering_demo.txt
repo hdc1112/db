@@ -1,0 +1,40 @@
+# Copy from one file to another, and each file has 10 blocks, block size is
+the parameter. If we fix the block size, we can see double buffering wins, and
+if we fix the memory consumption, we can see double buffering wins even more
+
+[2020-12-31 10:07:10.660] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 4096 bytes per block, takes time millis 10
+[2020-12-31 10:07:10.783] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 8192 bytes per block, takes time millis 15
+[2020-12-31 10:07:10.908] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 16384 bytes per block, takes time millis 13
+[2020-12-31 10:07:11.032] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 32768 bytes per block, takes time millis 15
+[2020-12-31 10:07:11.167] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 65536 bytes per block, takes time millis 22
+[2020-12-31 10:07:11.303] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 131072 bytes per block, takes time millis 25
+[2020-12-31 10:07:11.454] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 262144 bytes per block, takes time millis 36
+[2020-12-31 10:07:11.624] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 524288 bytes per block, takes time millis 51
+[2020-12-31 10:07:11.837] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 1048576 bytes per block, takes time millis 90
+[2020-12-31 10:07:12.090] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 2097152 bytes per block, takes time millis 121
+[2020-12-31 10:07:12.427] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 4194304 bytes per block, takes time millis 191
+[2020-12-31 10:07:12.915] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 8388608 bytes per block, takes time millis 308
+[2020-12-31 10:07:13.762] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 16777216 bytes per block, takes time millis 587
+[2020-12-31 10:07:15.201] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 33554432 bytes per block, takes time millis 1104
+[2020-12-31 10:07:17.729] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 67108864 bytes per block, takes time millis 2013
+[2020-12-31 10:07:22.168] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 134217728 bytes per block, takes time millis 3457
+[2020-12-31 10:07:30.925] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 268435456 bytes per block, takes time millis 6756
+[2020-12-31 10:07:48.492] [info] [DoubleBufferingPerfTest.cpp:88] Single thread 10 blocks 536870912 bytes per block, takes time millis 13598
+[2020-12-31 10:07:48.900] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 4096 bytes per block, takes time millis 11
+[2020-12-31 10:07:49.023] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 8192 bytes per block, takes time millis 13
+[2020-12-31 10:07:49.150] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 16384 bytes per block, takes time millis 13
+[2020-12-31 10:07:49.277] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 32768 bytes per block, takes time millis 15
+[2020-12-31 10:07:49.407] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 65536 bytes per block, takes time millis 20
+[2020-12-31 10:07:49.547] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 131072 bytes per block, takes time millis 23
+[2020-12-31 10:07:49.694] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 262144 bytes per block, takes time millis 30
+[2020-12-31 10:07:49.859] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 524288 bytes per block, takes time millis 45
+[2020-12-31 10:07:50.056] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 1048576 bytes per block, takes time millis 77
+[2020-12-31 10:07:50.283] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 2097152 bytes per block, takes time millis 93
+[2020-12-31 10:07:50.566] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 4194304 bytes per block, takes time millis 134
+[2020-12-31 10:07:50.969] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 8388608 bytes per block, takes time millis 227
+[2020-12-31 10:07:51.594] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 16777216 bytes per block, takes time millis 352
+[2020-12-31 10:07:52.639] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 33554432 bytes per block, takes time millis 714
+[2020-12-31 10:07:54.473] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 67108864 bytes per block, takes time millis 1339
+[2020-12-31 10:07:57.929] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 134217728 bytes per block, takes time millis 2504
+[2020-12-31 10:08:04.725] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 268435456 bytes per block, takes time millis 4787
+[2020-12-31 10:08:18.564] [info] [DoubleBufferingPerfTest.cpp:156] Double Buffering 10 blocks 536870912 bytes per block, takes time millis 9848
