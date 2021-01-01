@@ -3,7 +3,7 @@
 set -x
 set -e
 
-path=$(cd $(dirname ${BASH_SOURCE[0]}); pwd)
+path=$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)
 
 if [ -z $path ]; then
   echo "Cannot get script path" >&2
