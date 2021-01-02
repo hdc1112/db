@@ -269,22 +269,24 @@ std::ostream& operator<<(std::ostream& os, const DiskSpaceManager::DiskIOThreadS
     return os;
 }
 
-std::future<DiskCommandResult> createFile(DiskSpaceManager* diskSpaceManager, const char* fileName) {
+std::future<DiskCommandResult> createFile(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
+                                          const char* fileName) {
     return diskSpaceManager->submit(CreateFileCommand(fileName));
 }
 
-std::future<DiskCommandResult> removeFile(DiskSpaceManager* diskSpaceManager, const char* fileName) {
+std::future<DiskCommandResult> removeFile(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
+                                          const char* fileName) {
     return diskSpaceManager->submit(RemoveFileCommand(fileName));
 }
 
-std::future<DiskCommandResult> appendBlock(DiskSpaceManager* diskSpaceManager,
+std::future<DiskCommandResult> appendBlock(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
                                            const char* fileName,
                                            BlockBytes bytes,
                                            const uint8_t* const from) {
     return diskSpaceManager->submit(AppendBlockCommand(fileName, bytes, from));
 }
 
-std::future<DiskCommandResult> writeBlock(DiskSpaceManager* diskSpaceManager,
+std::future<DiskCommandResult> writeBlock(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
                                           const char* fileName,
                                           BlockId blockId,
                                           BlockBytes bytes,
@@ -292,8 +294,11 @@ std::future<DiskCommandResult> writeBlock(DiskSpaceManager* diskSpaceManager,
     return diskSpaceManager->submit(WriteBlockCommand(fileName, blockId, bytes, from));
 }
 
-std::future<DiskCommandResult> readBlock(
-    DiskSpaceManager* diskSpaceManager, const char* fileName, BlockId blockId, BlockBytes bytes, uint8_t* const to) {
+std::future<DiskCommandResult> readBlock(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
+                                         const char* fileName,
+                                         BlockId blockId,
+                                         BlockBytes bytes,
+                                         uint8_t* const to) {
     return diskSpaceManager->submit(ReadBlockCommannd(fileName, blockId, bytes, to));
 }
 

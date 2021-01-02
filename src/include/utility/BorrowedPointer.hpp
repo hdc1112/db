@@ -22,18 +22,28 @@ public:
         other._pointer = nullptr;
     }
     BorrowedPointer& operator=(const BorrowedPointer& other) noexcept {
-        _pointer = other._pointer;
+        if (this != &other) {
+            _pointer = other._pointer;
+        }
         return *this;
     }
     BorrowedPointer& operator=(BorrowedPointer&& other) noexcept {
-        _pointer = other._pointer;
-        other._pointer = nullptr;
-        borrowable()->release();
+        if (this != &other) {
+            _pointer = other._pointer;
+            other.reset();
+        }
         return *this;
     }
 
     T* get() const noexcept {
         return _pointer;
+    }
+
+    void reset() {
+        if (_pointer != nullptr) {
+            borrowable()->release();
+            _pointer = nullptr;
+        }
     }
 
     BorrowableObject<T>* borrowable() noexcept {
@@ -53,9 +63,7 @@ public:
     }
 
     ~BorrowedPointer() {
-        if (_pointer != nullptr) {
-            borrowable()->release();
-        }
+        reset();
     }
 
 private:

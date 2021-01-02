@@ -4,6 +4,7 @@
 #include "diskspace/DiskCommands.hpp"
 #include "diskspace/DiskSpaceTypes.hpp"
 #include "utility/BlockingQueue.hpp"
+#include "utility/BorrowedPointer.hpp"
 
 #include "spdlog/spdlog.h"
 
@@ -15,7 +16,10 @@ using namespace std::chrono_literals;
 
 namespace diskspace {
 
-class DiskSpaceManager {
+using utils::BorrowableObject;
+using utils::BorrowedPointer;
+
+class DiskSpaceManager : public BorrowableObject<DiskSpaceManager> {
 public:
     void start();
     std::future<void> stop();
@@ -48,14 +52,22 @@ private:
     constexpr static std::chrono::milliseconds dequeueTimeout = 100ms;
 };
 
-std::future<DiskCommandResult> createFile(DiskSpaceManager* diskSpaceManager, const char* fileName);
-std::future<DiskCommandResult> removeFile(DiskSpaceManager* diskSpaceManager, const char* fileName);
-std::future<DiskCommandResult> appendBlock(DiskSpaceManager* diskSpaceManager,
+std::future<DiskCommandResult> createFile(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
+                                          const char* fileName);
+std::future<DiskCommandResult> removeFile(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
+                                          const char* fileName);
+std::future<DiskCommandResult> appendBlock(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
                                            const char* fileName,
                                            BlockBytes bytes,
                                            const uint8_t* from);
-std::future<DiskCommandResult> writeBlock(
-    DiskSpaceManager* diskSpaceManager, const char* fileName, BlockId blockId, BlockBytes bytes, const uint8_t* from);
-std::future<DiskCommandResult> readBlock(
-    DiskSpaceManager* diskSpaceManager, const char* fileName, BlockId blockId, BlockBytes bytes, uint8_t* to);
+std::future<DiskCommandResult> writeBlock(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
+                                          const char* fileName,
+                                          BlockId blockId,
+                                          BlockBytes bytes,
+                                          const uint8_t* from);
+std::future<DiskCommandResult> readBlock(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
+                                         const char* fileName,
+                                         BlockId blockId,
+                                         BlockBytes bytes,
+                                         uint8_t* to);
 } // namespace diskspace
