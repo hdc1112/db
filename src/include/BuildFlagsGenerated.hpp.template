@@ -4,3 +4,4 @@
 
 constexpr bool kDebugAssertCrashIfFail = @DEBUG_ASSERT_CRASH_IF_FAIL@;
 constexpr bool kReleaseAssertCrashIfFail = @RELEASE_ASSERT_CRASH_IF_FAIL@;
+constexpr bool kBorrowedCounterCheck = @BORROWED_COUNTER_CHECK@;
