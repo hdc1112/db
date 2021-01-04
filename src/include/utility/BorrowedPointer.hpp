@@ -4,6 +4,7 @@
 #include "BuildFlagsGenerated.hpp"
 
 #include <atomic>
+#include <typeinfo>
 
 namespace utils {
 
@@ -12,25 +13,45 @@ class BorrowableObject;
 template<typename T>
 class BorrowedPointer {
 public:
+    BorrowedPointer() = default;
     explicit BorrowedPointer(T* pointer) : _pointer(pointer) {}
     BorrowedPointer(const BorrowedPointer& other) noexcept {
-        _pointer = other._pointer;
-        borrowable()->increment();
+        if (other._pointer != nullptr) {
+            _pointer = other._pointer;
+            borrowable()->increment();
+        }
     }
     BorrowedPointer(BorrowedPointer&& other) noexcept {
         _pointer = other._pointer;
         other._pointer = nullptr;
     }
+
     BorrowedPointer& operator=(const BorrowedPointer& other) noexcept {
         if (this != &other) {
-            _pointer = other._pointer;
+            if (other._pointer != nullptr) {
+                bool isNull = (_pointer == nullptr);
+                _pointer = other._pointer;
+                if (isNull) {
+                    borrowable()->increment();
+                }
+            } else {
+                reset();
+            }
         }
         return *this;
     }
     BorrowedPointer& operator=(BorrowedPointer&& other) noexcept {
         if (this != &other) {
-            _pointer = other._pointer;
-            other.reset();
+            if (_pointer != nullptr && other._pointer != nullptr) {
+                _pointer = other._pointer;
+                other.reset();
+            } else if (_pointer == nullptr && other._pointer != nullptr) {
+                _pointer = other._pointer;
+                other._pointer = nullptr;
+            } else if (_pointer != nullptr && other._pointer == nullptr) {
+                _pointer = other._pointer;
+                reset();
+            }
         }
         return *this;
     }
@@ -123,7 +144,7 @@ public:
     }
 
     ~BorrowableObject() {
-        DEBUG_ASSERT(count() == 0, "{} BorrowedPointers not returned", count());
+        DEBUG_ASSERT(count() == 0, "For {}, {} BorrowedPointers are not returned", typeid(*this).name(), count());
     }
 };
 } // namespace utils

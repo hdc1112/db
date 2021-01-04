@@ -52,22 +52,20 @@ private:
     constexpr static std::chrono::milliseconds dequeueTimeout = 100ms;
 };
 
-std::future<DiskCommandResult> createFile(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
-                                          const char* fileName);
-std::future<DiskCommandResult> removeFile(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
-                                          const char* fileName);
-std::future<DiskCommandResult> appendBlock(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
+std::future<DiskCommandResult> createFile(BorrowedPointer<DiskSpaceManager> diskSpaceManager, const char* fileName);
+std::future<DiskCommandResult> removeFile(BorrowedPointer<DiskSpaceManager> diskSpaceManager, const char* fileName);
+std::future<DiskCommandResult> appendBlock(BorrowedPointer<DiskSpaceManager> diskSpaceManager,
                                            const char* fileName,
                                            BlockBytes bytes,
-                                           const uint8_t* from);
-std::future<DiskCommandResult> writeBlock(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
+                                           const void* buffer);
+std::future<DiskCommandResult> writeBlock(BorrowedPointer<DiskSpaceManager> diskSpaceManager,
                                           const char* fileName,
                                           BlockId blockId,
                                           BlockBytes bytes,
-                                          const uint8_t* from);
-std::future<DiskCommandResult> readBlock(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
+                                          const void* from);
+std::future<DiskCommandResult> readBlock(BorrowedPointer<DiskSpaceManager> diskSpaceManager,
                                          const char* fileName,
                                          BlockId blockId,
                                          BlockBytes bytes,
-                                         uint8_t* to);
+                                         void* to);
 } // namespace diskspace

@@ -19,29 +19,29 @@ struct RemoveFileCommand {
 };
 
 struct AppendBlockCommand {
-    AppendBlockCommand(const char* fileName, BlockBytes bytes, const uint8_t* const from)
+    AppendBlockCommand(const char* fileName, BlockBytes bytes, const void* from)
         : fileName(fileName), bytes(bytes), from(from) {}
     const char* fileName;
     BlockBytes bytes;
-    const uint8_t* const from;
+    const void* from;
 };
 
 struct WriteBlockCommand {
-    WriteBlockCommand(const char* fileName, BlockId blockId, BlockBytes bytes, const uint8_t* const from)
+    WriteBlockCommand(const char* fileName, BlockId blockId, BlockBytes bytes, const void* from)
         : fileName(fileName), blockId(blockId), bytes(bytes), from(from) {}
     const char* fileName;
     BlockId blockId;
     BlockBytes bytes;
-    const uint8_t* const from;
+    const void* from;
 };
 
 struct ReadBlockCommannd {
-    ReadBlockCommannd(const char* fileName, BlockId blockId, BlockBytes bytes, uint8_t* const to)
+    ReadBlockCommannd(const char* fileName, BlockId blockId, BlockBytes bytes, void* to)
         : fileName(fileName), blockId(blockId), bytes(bytes), to(to) {}
     const char* fileName;
     BlockId blockId;
     BlockBytes bytes;
-    uint8_t* const to;
+    void* to;
 };
 
 using DiskCommand =
@@ -59,19 +59,19 @@ inline std::ostream& operator<<(std::ostream& os, const RemoveFileCommand& remov
 
 inline std::ostream& operator<<(std::ostream& os, const AppendBlockCommand& appendBlockCommand) {
     os << "AppendBlockCommand {fileName = " << appendBlockCommand.fileName << ", bytes = " << appendBlockCommand.bytes
-       << ", from = " << std::hex << uintptr_t(appendBlockCommand.from) << "}";
+       << ", from = " << fmt::ptr(appendBlockCommand.from) << "}";
     return os;
 }
 
 inline std::ostream& operator<<(std::ostream& os, const WriteBlockCommand& writeBlockCommand) {
     os << "WriteBlockCommand {fileName = " << writeBlockCommand.fileName << ", blockId = " << writeBlockCommand.blockId
-       << ", bytes = " << writeBlockCommand.bytes << ", from " << std::hex << uintptr_t(writeBlockCommand.from) << "}";
+       << ", bytes = " << writeBlockCommand.bytes << ", from " << fmt::ptr(writeBlockCommand.from) << "}";
     return os;
 }
 
 inline std::ostream& operator<<(std::ostream& os, const ReadBlockCommannd& readBlockCommannd) {
     os << "ReadBlockCommand {fileName = " << readBlockCommannd.fileName << ", blockId = " << readBlockCommannd.blockId
-       << ", bytes = " << readBlockCommannd.bytes << ", to = " << std::hex << uintptr_t(readBlockCommannd.to) << "}";
+       << ", bytes = " << readBlockCommannd.bytes << ", to = " << fmt::ptr(readBlockCommannd.to) << "}";
     return os;
 }
 

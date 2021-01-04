@@ -46,6 +46,7 @@ ErrCode errnoToErrCode(int err) noexcept {
         case EIO:
             return ERR_IO;
         default:
+            SPDLOG_ERROR("Errno {} is not categorized for now", err);
             return ERR_UNCATEGORIZED;
     }
 

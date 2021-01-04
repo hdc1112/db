@@ -19,10 +19,3 @@
             DEBUG_ABORT("future is not valid, wait() operation cannot proceed");                                       \
         }                                                                                                              \
     } while (false)
-
-template<typename T>
-inline std::future<T> completedFuture() {
-    std::promise<T> promise;
-    promise.set_value(T());
-    return promise.get_future();
-}

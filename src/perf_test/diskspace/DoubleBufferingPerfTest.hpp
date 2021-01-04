@@ -54,24 +54,12 @@ public:
     static std::unique_ptr<DiskSpaceManager> diskSpaceManager;
 };
 
-INSTANTIATE_TEST_SUITE_P(DoubleBufferingPerfTest,
-                         DoubleBufferingPerfTestFixture,
-                         ::testing::Values(4_KB,
-                                           8_KB,
-                                           16_KB,
-                                           32_KB,
-                                           64_KB,
-                                           128_KB,
-                                           256_KB,
-                                           512_KB,
-                                           1_MB,
-                                           2_MB,
-                                           4_MB,
-                                           8_MB,
-                                           16_MB,
-                                           32_MB,
-                                           64_MB,
-                                           128_MB,
-                                           256_MB,
-                                           512_MB));
+INSTANTIATE_TEST_SUITE_P(
+    DoubleBufferingPerfTest,
+    DoubleBufferingPerfTestFixture,
+    ::testing::Values(
+        4_KB, 8_KB, 16_KB, 32_KB, 64_KB, 128_KB, 256_KB, 512_KB, 1_MB, 2_MB, 4_MB, 8_MB, 16_MB, 32_MB, 64_MB));
+//                                           128_MB,
+//                                           256_MB,
+//                                           512_MB));
 } // namespace diskspace

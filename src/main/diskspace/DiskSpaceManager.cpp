@@ -54,7 +54,7 @@ bool processRemoveFileDiskCommand(const RemoveFileCommand& removeFileCommand) {
 }
 
 bool processAppendBlockCommand(const AppendBlockCommand& appendBlockCommand) {
-    auto [fileName, bytes, from] = appendBlockCommand;
+    auto& [fileName, bytes, from] = appendBlockCommand;
 
     int oflag = O_WRONLY | O_APPEND;
     int fd = open(fileName, oflag);
@@ -83,7 +83,7 @@ bool processAppendBlockCommand(const AppendBlockCommand& appendBlockCommand) {
 }
 
 bool processWriteBlockCommand(const WriteBlockCommand& writeBlockCommand) {
-    auto [fileName, blockId, bytes, from] = writeBlockCommand;
+    auto& [fileName, blockId, bytes, from] = writeBlockCommand;
 
     int oflag = O_WRONLY;
     int fd = open(fileName, oflag);
@@ -117,7 +117,7 @@ bool processWriteBlockCommand(const WriteBlockCommand& writeBlockCommand) {
 }
 
 bool processReadBlockCommand(const ReadBlockCommannd& readBlockCommannd) {
-    auto [fileName, blockId, bytes, to] = readBlockCommannd;
+    auto& [fileName, blockId, bytes, to] = readBlockCommannd;
 
     int oflag = O_RDONLY;
     int fd = open(fileName, oflag);
@@ -220,6 +220,10 @@ void DiskSpaceManager::submit(DiskCommandsGroup diskCommandsGroup) {
 
 void DiskSpaceManager::run() {
     while (_state == DiskIOThreadState::Running || _state == DiskIOThreadState::Stopping) {
+        if (_state == DiskIOThreadState::Stopping) {
+            SPDLOG_WARN("Stop command detected, will stop after finishing remaining I/O commands");
+        }
+
         auto diskCommandsGroup = _q.tryDequeue(dequeueTimeout);
 
         if (!diskCommandsGroup) {
@@ -232,7 +236,7 @@ void DiskSpaceManager::run() {
 
         bool commandsSuccess = true;
         ErrCode commandsErrCode = ERR_NO_ERROR;
-        for (auto diskCommand : diskCommandsGroup->diskCommands) {
+        for (auto& diskCommand : diskCommandsGroup->diskCommands) {
             SPDLOG_INFO("Process disk command: {}", diskCommand);
             bool success = processDiskCommand(diskCommand);
             SPDLOG_INFO("Disk command result: Success = {} {}", success, success ? "" : strErrCode(errCode));
@@ -269,36 +273,34 @@ std::ostream& operator<<(std::ostream& os, const DiskSpaceManager::DiskIOThreadS
     return os;
 }
 
-std::future<DiskCommandResult> createFile(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
-                                          const char* fileName) {
+std::future<DiskCommandResult> createFile(BorrowedPointer<DiskSpaceManager> diskSpaceManager, const char* fileName) {
     return diskSpaceManager->submit(CreateFileCommand(fileName));
 }
 
-std::future<DiskCommandResult> removeFile(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
-                                          const char* fileName) {
+std::future<DiskCommandResult> removeFile(BorrowedPointer<DiskSpaceManager> diskSpaceManager, const char* fileName) {
     return diskSpaceManager->submit(RemoveFileCommand(fileName));
 }
 
-std::future<DiskCommandResult> appendBlock(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
+std::future<DiskCommandResult> appendBlock(BorrowedPointer<DiskSpaceManager> diskSpaceManager,
                                            const char* fileName,
                                            BlockBytes bytes,
-                                           const uint8_t* const from) {
+                                           const void* from) {
     return diskSpaceManager->submit(AppendBlockCommand(fileName, bytes, from));
 }
 
-std::future<DiskCommandResult> writeBlock(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
+std::future<DiskCommandResult> writeBlock(BorrowedPointer<DiskSpaceManager> diskSpaceManager,
                                           const char* fileName,
                                           BlockId blockId,
                                           BlockBytes bytes,
-                                          const uint8_t* const from) {
+                                          const void* from) {
     return diskSpaceManager->submit(WriteBlockCommand(fileName, blockId, bytes, from));
 }
 
-std::future<DiskCommandResult> readBlock(const BorrowedPointer<DiskSpaceManager>& diskSpaceManager,
+std::future<DiskCommandResult> readBlock(BorrowedPointer<DiskSpaceManager> diskSpaceManager,
                                          const char* fileName,
                                          BlockId blockId,
                                          BlockBytes bytes,
-                                         uint8_t* const to) {
+                                         void* to) {
     return diskSpaceManager->submit(ReadBlockCommannd(fileName, blockId, bytes, to));
 }
 

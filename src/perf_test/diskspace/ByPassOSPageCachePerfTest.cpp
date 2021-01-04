@@ -76,8 +76,7 @@ bool readFile(const char* fileName, BlockNum blockNum, BlockBytes blockBytes, bo
         return false;
     }
 
-    auto* buffer = new uint8_t[blockBytes];
-    utils::ScopeGuard releaseBufferGuard([buffer]() { delete[] buffer; });
+    std::vector<uint8_t> buffer(blockBytes, 0);
 
     errCode = ERR_NO_ERROR;
 
@@ -97,7 +96,7 @@ bool readFile(const char* fileName, BlockNum blockNum, BlockBytes blockBytes, bo
     }
 
     for (BlockNum i = 0; i < blockNum; ++i) {
-        if (ret = read(fd, buffer, blockBytes); ret != blockBytes) {
+        if (ret = read(fd, buffer.data(), blockBytes); ret != blockBytes) {
             errCode = errnoToErrCode(errno);
             return false;
         }
@@ -109,13 +108,13 @@ bool readFile(const char* fileName, BlockNum blockNum, BlockBytes blockBytes, bo
 TEST(ByPassOSPageCachePerfTest, readDataFromMemory) {
     BlockNum blockNum = 1024;
     BlockBytes blockBytes = 1_MB;
-    auto* from = new uint8_t[blockNum * blockBytes];
-    auto* to = new uint8_t[blockNum * blockBytes];
+    std::vector<uint8_t> from(blockNum * blockBytes);
+    std::vector<uint8_t> to(blockNum * blockBytes);
 
     for (int i = 0; i < 10; ++i) {
         utils::StopWatch stopWatch;
         stopWatch.start();
-        std::copy(from, from + blockNum * blockBytes, to);
+        std::copy(std::begin(from), std::end(from), std::begin(to));
         stopWatch.stop();
         SPDLOG_INFO("Read data from memory takes millis {}", stopWatch.elapsedMs().count());
     }
