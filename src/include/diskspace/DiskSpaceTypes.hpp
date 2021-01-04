@@ -26,9 +26,6 @@ constexpr BlockBytes operator"" _GB(unsigned long long num) {
     return num * 1024 * 1024 * 1024;
 }
 
-using utils::BorrowableObject;
-using utils::BorrowedPointer;
-
 struct DiskCommandResult {
     DiskCommandResult() : success(true), errCode(ERR_NO_ERROR) {}
     DiskCommandResult(bool success, ErrCode errCode) : success(success), errCode(errCode) {}
