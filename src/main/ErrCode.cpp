@@ -26,10 +26,14 @@ std::string strErrCode(ErrCode errorCode) noexcept {
             return ERROR_MESSAGE("Operation not permitted");
         case ERR_IO:
             return ERROR_MESSAGE("Error I/O");
-        case ERR_UNCATEGORIZED:
-            return ERROR_MESSAGE("Uncategorized error");
         case ERR_SERVICE_UNAVAILABLE:
             return ERROR_MESSAGE("Unavailable service");
+        case ERR_IO_R_TIMEOUT:
+            return ERROR_MESSAGE("Error I/O Read timeout");
+        case ERR_IO_W_TIMEOUT:
+            return ERROR_MESSAGE("Error I/O Write timeout");
+        case ERR_UNCATEGORIZED:
+            return ERROR_MESSAGE("Uncategorized error");
         default:
             DEBUG_ABORT("Cannot understand this error code {}", errorCode);
             return ERROR_MESSAGE("Unknown error code");

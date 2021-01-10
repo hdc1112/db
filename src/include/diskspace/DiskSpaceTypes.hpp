@@ -10,21 +10,9 @@
 #include <utility>
 
 namespace diskspace {
-using BlockNum = uint32_t;
-using BlockId = uint32_t;
-using BlockBytes = uint32_t;
-
-constexpr BlockBytes operator"" _KB(unsigned long long num) {
-    return num * 1024;
-}
-
-constexpr BlockBytes operator"" _MB(unsigned long long num) {
-    return num * 1024 * 1024;
-}
-
-constexpr BlockBytes operator"" _GB(unsigned long long num) {
-    return num * 1024 * 1024 * 1024;
-}
+using BlockNum = std::size_t;
+using BlockId = std::size_t;
+using BlockBytes = std::size_t;
 
 struct DiskCommandResult {
     DiskCommandResult() : success(true), errCode(ERR_NO_ERROR) {}

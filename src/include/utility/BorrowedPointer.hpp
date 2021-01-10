@@ -2,6 +2,7 @@
 
 #include "Assert.hpp"
 #include "BuildFlagsGenerated.hpp"
+#include "utility/ClassUtility.hpp"
 
 #include <atomic>
 #include <typeinfo>
@@ -87,6 +88,38 @@ public:
         reset();
     }
 
+    bool operator==(const BorrowedPointer& other) const {
+        return _pointer == other._pointer;
+    }
+
+    bool operator!=(const BorrowedPointer& other) const {
+        return _pointer != other._pointer;
+    }
+
+    bool operator<(const BorrowedPointer& other) const {
+        return _pointer < other._pointer;
+    }
+
+    bool operator<=(const BorrowedPointer& other) const {
+        return _pointer <= other._pointer;
+    }
+
+    bool operator>(const BorrowedPointer& other) const {
+        return _pointer > other._pointer;
+    }
+
+    bool operator>=(const BorrowedPointer& other) const {
+        return _pointer >= other._pointer;
+    }
+
+    bool operator==(const void* other) const {
+        return _pointer == other;
+    }
+
+    bool operator!=(const void* other) const {
+        return !(*this == other);
+    }
+
 private:
     T* _pointer;
 };
@@ -144,7 +177,7 @@ public:
     }
 
     ~BorrowableObject() {
-        DEBUG_ASSERT(count() == 0, "For {}, {} BorrowedPointers are not returned", typeid(*this).name(), count());
+        DEBUG_ASSERT(count() == 0, "For {}, {} BorrowedPointers are not returned", __class__, count());
     }
 };
 } // namespace utils

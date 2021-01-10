@@ -1,4 +1,5 @@
 #include "FutureTestUtility.hpp"
+#include "SizeTypes.hpp"
 #include "diskspace/DiskSpaceManager.hpp"
 #include "diskspace/DiskSpaceManagerTestUtility.hpp"
 #include "diskspace/DiskSpaceTypes.hpp"
