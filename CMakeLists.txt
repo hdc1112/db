@@ -3,6 +3,7 @@ project(db)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+include(cmake/macos.cmake)
 include(cmake/flavor.cmake)
 include(cmake/third-party.cmake)
 include(cmake/utility.cmake)
