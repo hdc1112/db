@@ -2,6 +2,7 @@
 
 #include "buffer/BufferPoolManager.hpp"
 #include "buffer/MemoryRegion.hpp"
+#include "buffer/clock/BufferFrameClock.hpp"
 #include "diskspace/DiskSpaceManager.hpp"
 
 #include <memory>
@@ -14,7 +15,6 @@ public:
                            FrameBytes frameBytes,
                            utils::BorrowedPointer<diskspace::DiskSpaceManager> diskSpaceManager)
         : BufferPoolManager(EvictPolicy::CLOCK, diskFileName, maxFrameNum, frameBytes),
-          _memoryRegions({}),
           _diskSpaceManager(std::move(diskSpaceManager)) {}
 
     ~BufferPoolManagerClock();
