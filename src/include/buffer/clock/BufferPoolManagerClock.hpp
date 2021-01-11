@@ -14,19 +14,21 @@ public:
                            FrameNum maxFrameNum,
                            FrameBytes frameBytes,
                            utils::BorrowedPointer<diskspace::DiskSpaceManager> diskSpaceManager)
-        : BufferPoolManager(EvictPolicy::CLOCK, diskFileName, maxFrameNum, frameBytes),
-          _diskSpaceManager(std::move(diskSpaceManager)) {}
+        : BufferPoolManager(EvictPolicy::CLOCK, diskFileName, maxFrameNum, frameBytes, std::move(diskSpaceManager)) {}
 
     ~BufferPoolManagerClock();
 
 protected:
     BufferFrame getBufferFrame(diskspace::BlockId blockId) override;
+    void flush() override {
+        flush_();
+    }
 
 private:
     std::pair<FrameId, utils::BorrowedPointer<MemoryRegion>> allocateNewMemoryRegion();
+    void flush_();
 
     std::vector<std::unique_ptr<MemoryRegion>> _memoryRegions{};
     std::unordered_map<diskspace::BlockId, BufferFrameClock> _rawPages{};
-    utils::BorrowedPointer<diskspace::DiskSpaceManager> _diskSpaceManager;
 };
 } // namespace buffer

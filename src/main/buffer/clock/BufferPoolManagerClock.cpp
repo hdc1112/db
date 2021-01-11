@@ -1,5 +1,8 @@
 #include "buffer/clock/BufferPoolManagerClock.hpp"
+#include "buffer/BufferParameters.hpp"
 #include "buffer/clock/BufferFrameClock.hpp"
+#include "diskspace/DiskSpaceTypes.hpp"
+#include "utility/FutureUtility.hpp"
 
 namespace buffer {
 BufferFrame BufferPoolManagerClock::getBufferFrame(diskspace::BlockId blockId) {
@@ -9,7 +12,7 @@ BufferFrame BufferPoolManagerClock::getBufferFrame(diskspace::BlockId blockId) {
         auto [newFrameId, newMemoryRegion] = allocateNewMemoryRegion();
         auto future =
             readBlock(_diskSpaceManager, _diskFileName.data(), blockId, _frameBytes, newMemoryRegion->address());
-        if (auto status = future.wait_for(_ioWaitTime); status == std::future_status::ready) {
+        if (auto status = future.wait_for(DISK_IO_WAIT_MILLIS); status == std::future_status::ready) {
             BufferFrameClock newBufferFrame{newFrameId, _frameBytes, blockId, newMemoryRegion};
             _rawPages.emplace(blockId, std::move(newBufferFrame));
             return _rawPages.at(blockId);
@@ -30,22 +33,34 @@ std::pair<FrameId, utils::BorrowedPointer<MemoryRegion>> BufferPoolManagerClock:
     return {newFrameId, _memoryRegions.back()->borrow()};
 }
 
-BufferPoolManagerClock::~BufferPoolManagerClock() {
+void BufferPoolManagerClock::flush_() {
     SPDLOG_INFO("Begin to flush dirty pages to disk");
     DEBUG_ASSERT(_rawPages.size() == _memoryRegions.size(), "Memory management issue");
+    std::vector<diskspace::DiskCommand> diskCommands;
     for (auto [_, bufferFrameClock] : _rawPages) {
-        // TODO: check pinned
+        // TODO: check pinned or not
         if (bufferFrameClock.isDirty()) {
             auto blockId = bufferFrameClock.getBlockid();
             void* from = bufferFrameClock.getMemoryRegion()->address();
-            auto future = writeBlock(_diskSpaceManager, _diskFileName.data(), blockId, _frameBytes, from);
-            if (auto status = future.wait_for(_ioWaitTime); status == std::future_status::ready) {
-                bufferFrameClock.setDirty(false);
-            } else {
-                errCode = ERR_IO_W_TIMEOUT;
-                DEBUG_ABORT("Disk write time out");
-            }
+            diskspace::WriteBlockCommand writeBlockCommand{_diskFileName.data(), blockId, _frameBytes, from};
+            diskCommands.emplace_back(writeBlockCommand);
         }
     }
+    auto diskCommandResult = _diskSpaceManager->submit(diskCommands);
+    auto commandsWaitTime = diskCommands.size() * DISK_IO_WAIT_MILLIS;
+    if (auto status = diskCommandResult.wait_for(commandsWaitTime); status == std::future_status::ready) {
+        if (auto [success, errCode] = diskCommandResult.get(); success) {
+            SPDLOG_INFO("Successful flush");
+        } else {
+            SPDLOG_ERROR("Flush is not successful {}", strErrCode(errCode));
+        }
+    } else {
+        errCode = ERR_IO_W_TIMEOUT;
+        SPDLOG_ERROR("Flush is not successful {}", strErrCode(errCode));
+    }
+}
+
+BufferPoolManagerClock::~BufferPoolManagerClock() {
+    flush_();
 }
 } // namespace buffer

@@ -4,11 +4,10 @@
 #include "SizeTypes.hpp"
 #include "buffer/BufferFrame.hpp"
 #include "buffer/EvictPolicy.hpp"
+#include "diskspace/DiskSpaceManager.hpp"
 
 #include <chrono>
 #include <unordered_map>
-
-using namespace std::chrono_literals;
 
 namespace buffer {
 
@@ -23,8 +22,13 @@ public:
     BufferPoolManager(EvictPolicy evictPolicy,
                       std::string_view diskFileName,
                       FrameNum maxFrameNum,
-                      FrameBytes frameBytes)
-        : _evictPolicy(evictPolicy), _diskFileName(diskFileName), _maxFrameNum(maxFrameNum), _frameBytes(frameBytes) {}
+                      FrameBytes frameBytes,
+                      utils::BorrowedPointer<diskspace::DiskSpaceManager> diskSpaceManager)
+        : _evictPolicy(evictPolicy),
+          _diskFileName(diskFileName),
+          _maxFrameNum(maxFrameNum),
+          _frameBytes(frameBytes),
+          _diskSpaceManager(std::move(diskSpaceManager)) {}
 
     [[nodiscard]] EvictPolicy getEvictPolicy() const {
         return _evictPolicy;
@@ -38,12 +42,13 @@ public:
 
 protected:
     virtual BufferFrame getBufferFrame(diskspace::BlockId blockId) = 0;
-    constexpr static std::chrono::milliseconds _ioWaitTime = 100ms;
+    virtual void flush() = 0;
 
     EvictPolicy _evictPolicy;
     std::string_view _diskFileName;
     FrameNum _maxFrameNum;
     FrameBytes _frameBytes;
+    utils::BorrowedPointer<diskspace::DiskSpaceManager> _diskSpaceManager;
 };
 
 } // namespace buffer
