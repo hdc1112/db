@@ -32,6 +32,8 @@ std::string strErrCode(ErrCode errorCode) noexcept {
             return ERROR_MESSAGE("Error I/O Read timeout");
         case ERR_IO_W_TIMEOUT:
             return ERROR_MESSAGE("Error I/O Write timeout");
+        case ERR_GENERAL_TIMEOUT:
+            return ERROR_MESSAGE("General timeout error");
         case ERR_UNCATEGORIZED:
             return ERROR_MESSAGE("Uncategorized error");
         default:

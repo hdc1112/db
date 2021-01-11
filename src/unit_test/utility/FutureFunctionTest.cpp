@@ -1,8 +1,12 @@
 #include <future>
 
+#include "ErrCode.hpp"
 #include "FutureTestUtility.hpp"
+#include "utility/FutureUtility.hpp"
 
 #include "gtest/gtest.h"
+
+using namespace std::chrono_literals;
 
 namespace utils {
 namespace {
@@ -47,6 +51,24 @@ TEST(BasicFutureTest, SharedFutureMove) {
     EXPECT_FALSE(future1.valid());
     ASSERT_EXIT(future1.get(), ::testing::KilledBySignal(SIGSEGV), ".*");
     EXPECT_EQ(5, future2.get());
+}
+
+TEST(BasicFutureTest, CompositeFutureAllComplete) {
+    utils::CompositeFuture<void> compositeFuture;
+    compositeFuture.emplace(completedFuture<void>());
+    compositeFuture.emplace(completedFuture<void>());
+    compositeFuture.emplace(completedFuture<void>());
+    compositeFuture.wait(1ms);
+    EXPECT_EQ(errCode, ERR_NO_ERROR);
+}
+
+TEST(BasicFutureTest, CompositeFutureTimeout) {
+    utils::CompositeFuture<int> compositeFuture;
+    std::promise<int> promise1;
+    compositeFuture.emplace(promise1.get_future());
+    compositeFuture.emplace(completedFuture<int>());
+    compositeFuture.wait(10ms);
+    EXPECT_EQ(errCode, ERR_GENERAL_TIMEOUT);
 }
 } // namespace
 } // namespace utils

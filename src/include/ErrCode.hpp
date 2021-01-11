@@ -16,6 +16,7 @@ constexpr short ERR_IO = 6;
 constexpr short ERR_SERVICE_UNAVAILABLE = 7;
 constexpr short ERR_IO_R_TIMEOUT = 8;
 constexpr short ERR_IO_W_TIMEOUT = 9;
+constexpr short ERR_GENERAL_TIMEOUT = 10;
 constexpr short ERR_UNCATEGORIZED = 1000;
 
 std::string strErrCode(ErrCode errorCode) noexcept;
