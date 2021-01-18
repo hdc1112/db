@@ -22,19 +22,18 @@ namespace buffer {
  * Note that the customer of Buffer layer does not need to know any eviction policy specific data fields, so Buffer
  * pool manager always returns a BufferFrame instead of BufferFrame's subclasses.
  */
-class BufferFrame : public utils::BorrowableObject<BufferFrame> {
+template<EvictPolicy evictPolicy>
+class BufferFrame : public utils::BorrowableObject<BufferFrame<evictPolicy>> {
 public:
     BufferFrame() = default;
-    BufferFrame(FrameId frameId,
-                diskspace::BlockId blockId,
-                std::vector<uint8_t> memory)
-        : _frameId(frameId),
-          _blockId(blockId),
-          _dirty(false),
-          _pinCount(1),
-          _memory(std::move(memory)) {}
+    BufferFrame(FrameId frameId, diskspace::BlockId blockId, std::vector<uint8_t> memory)
+        : _frameId(frameId), _blockId(blockId), _dirty(false), _pinCount(1), _memory(std::move(memory)) {}
 
     // -- Getters
+
+    EvictPolicy getEvictPolicy() {
+        return evictPolicy;
+    }
 
     [[nodiscard]] bool pinned() const {
         return _pinCount > 0;

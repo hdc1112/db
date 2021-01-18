@@ -4,12 +4,10 @@
 #include "buffer/BufferPoolTypes.hpp"
 
 namespace buffer {
-class BufferFrameClock : public BufferFrame {
+class BufferFrameClock : public BufferFrame<EvictPolicy::CLOCK> {
 public:
     BufferFrameClock() = default;
-    BufferFrameClock(FrameId frameId,
-                     diskspace::BlockId blockId,
-                     std::vector<uint8_t> memory)
+    BufferFrameClock(FrameId frameId, diskspace::BlockId blockId, std::vector<uint8_t> memory)
         : BufferFrame(frameId, blockId, std::move(memory)), _refBit(true) {}
 
     void setRefBit() {

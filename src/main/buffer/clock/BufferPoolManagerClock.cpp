@@ -5,14 +5,14 @@
 #include "utility/FutureUtility.hpp"
 
 namespace buffer {
-utils::BorrowedPointer<BufferFrame> BufferPoolManagerClock::getBufferFrame(diskspace::BlockId blockId) {
+utils::BorrowedPointer<BufferFrame<EvictPolicy::CLOCK>> BufferPoolManagerClock::getBufferFrame(
+    diskspace::BlockId blockId) {
     if (auto rawPageIter = _sysPages.find(blockId); rawPageIter != _sysPages.end()) {
         return rawPageIter->second->borrow();
     } else if (auto numOfFrames = totalFrames(); numOfFrames < _maxFrameNum) {
         FrameId newFrameId = numOfFrames;
         std::vector<uint8_t> memory(_frameBytes);
-        auto future =
-            readBlock(_diskSpaceManager, _diskFileName.data(), blockId, _frameBytes, memory.data());
+        auto future = readBlock(_diskSpaceManager, _diskFileName.data(), blockId, _frameBytes, memory.data());
         if (auto status = future.wait_for(DISK_IO_WAIT_MILLIS); status == std::future_status::ready) {
             auto newBufferFrameClock = std::make_unique<BufferFrameClock>(newFrameId, blockId, memory);
             _sysPages.emplace(blockId, std::move(newBufferFrameClock));
@@ -52,10 +52,6 @@ void BufferPoolManagerClock::_flush() {
         errCode = ERR_IO_W_TIMEOUT;
         SPDLOG_ERROR("Flush is not successful {}", strErrCode(errCode));
     }
-}
-
-FrameNum BufferPoolManagerClock::totalFrames() {
-    return _sysPages.size();
 }
 
 BufferPoolManagerClock::~BufferPoolManagerClock() {

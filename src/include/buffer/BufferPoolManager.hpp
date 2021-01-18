@@ -24,11 +24,12 @@ public:
                       FrameNum maxFrameNum,
                       FrameBytes frameBytes,
                       utils::BorrowedPointer<diskspace::DiskSpaceManager> diskSpaceManager)
-                      :          _diskFileName(diskFileName),
+        : _diskFileName(diskFileName),
           _maxFrameNum(maxFrameNum),
           _frameBytes(frameBytes),
           _diskSpaceManager(std::move(diskSpaceManager)),
-          _nullBufferFrame(std::make_unique<BufferFrame>(0, 0, std::vector<uint8_t>())) {}
+          _sysPages({}),
+          _nullBufferFrame(std::make_unique<BufferFrame<evictPolicy>>(0, 0, std::vector<uint8_t>())) {}
 
     [[nodiscard]] EvictPolicy getEvictPolicy() const {
         return evictPolicy;
@@ -40,16 +41,21 @@ public:
         return PageType(bufferFrame);
     }
 
+    virtual ~BufferPoolManager() = default;
+
 protected:
-    virtual utils::BorrowedPointer<BufferFrame> getBufferFrame(diskspace::BlockId blockId) = 0;
-    virtual FrameNum totalFrames() = 0;
+    virtual utils::BorrowedPointer<BufferFrame<evictPolicy>> getBufferFrame(diskspace::BlockId blockId) = 0;
+    FrameNum totalFrames() {
+        return _sysPages.size();
+    }
     virtual void flush() = 0;
 
     std::string_view _diskFileName;
     FrameNum _maxFrameNum;
     FrameBytes _frameBytes;
     utils::BorrowedPointer<diskspace::DiskSpaceManager> _diskSpaceManager;
-    std::unique_ptr<BufferFrame> _nullBufferFrame;
+    std::unordered_map<diskspace::BlockId, std::unique_ptr<BufferFrame<evictPolicy>>> _sysPages{};
+    std::unique_ptr<BufferFrame<evictPolicy>> _nullBufferFrame;
 };
 
 } // namespace buffer
