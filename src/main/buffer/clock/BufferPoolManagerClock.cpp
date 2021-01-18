@@ -5,43 +5,36 @@
 #include "utility/FutureUtility.hpp"
 
 namespace buffer {
-BufferFrame BufferPoolManagerClock::getBufferFrame(diskspace::BlockId blockId) {
-    if (auto rawPageIter = _rawPages.find(blockId); rawPageIter != _rawPages.end()) {
-        return rawPageIter->second;
-    } else if (_memoryRegions.size() < _maxFrameNum) {
-        auto [newFrameId, newMemoryRegion] = allocateNewMemoryRegion();
+utils::BorrowedPointer<BufferFrame> BufferPoolManagerClock::getBufferFrame(diskspace::BlockId blockId) {
+    if (auto rawPageIter = _sysPages.find(blockId); rawPageIter != _sysPages.end()) {
+        return rawPageIter->second->borrow();
+    } else if (auto numOfFrames = totalFrames(); numOfFrames < _maxFrameNum) {
+        FrameId newFrameId = numOfFrames;
+        std::vector<uint8_t> memory(_frameBytes);
         auto future =
-            readBlock(_diskSpaceManager, _diskFileName.data(), blockId, _frameBytes, newMemoryRegion->address());
+            readBlock(_diskSpaceManager, _diskFileName.data(), blockId, _frameBytes, memory.data());
         if (auto status = future.wait_for(DISK_IO_WAIT_MILLIS); status == std::future_status::ready) {
-            BufferFrameClock newBufferFrame{newFrameId, _frameBytes, blockId, newMemoryRegion};
-            _rawPages.emplace(blockId, std::move(newBufferFrame));
-            return _rawPages.at(blockId);
+            auto newBufferFrameClock = std::make_unique<BufferFrameClock>(newFrameId, blockId, memory);
+            _sysPages.emplace(blockId, std::move(newBufferFrameClock));
+            return _sysPages.at(blockId)->borrow();
         } else {
             errCode = ERR_IO_R_TIMEOUT;
-            return BufferFrameClock();
+            return _nullBufferFrame->borrow();
         }
     } else {
         DEBUG_ABORT("Evict not support yet");
-        return BufferFrameClock();
+        return _nullBufferFrame->borrow();
     }
 }
 
-std::pair<FrameId, utils::BorrowedPointer<MemoryRegion>> BufferPoolManagerClock::allocateNewMemoryRegion() {
-    auto newFrameId = _memoryRegions.size();
-    auto memoryRegion = std::make_unique<MemoryRegion>(_frameBytes);
-    _memoryRegions.emplace_back(std::move(memoryRegion));
-    return {newFrameId, _memoryRegions.back()->borrow()};
-}
-
-void BufferPoolManagerClock::flush_() {
+void BufferPoolManagerClock::_flush() {
     SPDLOG_INFO("Begin to flush dirty pages to disk");
-    DEBUG_ASSERT(_rawPages.size() == _memoryRegions.size(), "Memory management issue");
     std::vector<diskspace::DiskCommand> diskCommands;
-    for (auto [_, bufferFrameClock] : _rawPages) {
+    for (auto& [_, bufferFrameClock] : _sysPages) {
         // TODO: check pinned or not
-        if (bufferFrameClock.isDirty()) {
-            auto blockId = bufferFrameClock.getBlockid();
-            void* from = bufferFrameClock.getMemoryRegion()->address();
+        if (bufferFrameClock->isDirty()) {
+            auto blockId = bufferFrameClock->getBlockid();
+            void* from = bufferFrameClock->address();
             diskspace::WriteBlockCommand writeBlockCommand{_diskFileName.data(), blockId, _frameBytes, from};
             diskCommands.emplace_back(writeBlockCommand);
         }
@@ -50,6 +43,7 @@ void BufferPoolManagerClock::flush_() {
     auto commandsWaitTime = diskCommands.size() * DISK_IO_WAIT_MILLIS;
     if (auto status = diskCommandResult.wait_for(commandsWaitTime); status == std::future_status::ready) {
         if (auto [success, errCode] = diskCommandResult.get(); success) {
+            // TODO reset dirty bit
             SPDLOG_INFO("Successful flush");
         } else {
             SPDLOG_ERROR("Flush is not successful {}", strErrCode(errCode));
@@ -60,7 +54,11 @@ void BufferPoolManagerClock::flush_() {
     }
 }
 
+FrameNum BufferPoolManagerClock::totalFrames() {
+    return _sysPages.size();
+}
+
 BufferPoolManagerClock::~BufferPoolManagerClock() {
-    flush_();
+    _flush();
 }
 } // namespace buffer

@@ -2,8 +2,9 @@
 
 #include "buffer/BufferPoolTypes.hpp"
 #include "buffer/EvictPolicy.hpp"
-#include "buffer/MemoryRegion.hpp"
 #include "utility/BorrowedPointer.hpp"
+
+#include <vector>
 
 namespace buffer {
 
@@ -21,19 +22,17 @@ namespace buffer {
  * Note that the customer of Buffer layer does not need to know any eviction policy specific data fields, so Buffer
  * pool manager always returns a BufferFrame instead of BufferFrame's subclasses.
  */
-class BufferFrame {
+class BufferFrame : public utils::BorrowableObject<BufferFrame> {
 public:
     BufferFrame() = default;
     BufferFrame(FrameId frameId,
-                FrameBytes frameBytes,
                 diskspace::BlockId blockId,
-                utils::BorrowedPointer<MemoryRegion> memoryRegion)
+                std::vector<uint8_t> memory)
         : _frameId(frameId),
-          _frameBytes(frameBytes),
           _blockId(blockId),
           _dirty(false),
           _pinCount(1),
-          _memoryRegion(std::move(memoryRegion)) {}
+          _memory(std::move(memory)) {}
 
     // -- Getters
 
@@ -46,15 +45,23 @@ public:
     }
 
     [[nodiscard]] bool valid() const {
-        return _memoryRegion != nullptr;
+        return !_memory.empty();
     }
 
     [[nodiscard]] diskspace::BlockId getBlockid() const {
         return _blockId;
     }
 
-    [[nodiscard]] utils::BorrowedPointer<MemoryRegion> getMemoryRegion() const {
-        return _memoryRegion;
+    void* address() {
+        return _memory.data();
+    }
+
+    const void* address() const {
+        return _memory.data();
+    }
+
+    FrameBytes size() const {
+        return _memory.size();
     }
 
     // - Setters
@@ -64,16 +71,15 @@ public:
     }
 
 private:
-    FrameId _frameId;
-    FrameBytes _frameBytes;
+    FrameId _frameId{};
 
     // The blockId is only used to flush this buffer frame. It is invisible to buffer's customer.
-    diskspace::BlockId _blockId;
+    diskspace::BlockId _blockId{};
 
-    bool _dirty;
+    bool _dirty{};
 
     // Buffer frame is created only when loading a disk block, so count is init to 1.
-    PinCount _pinCount;
-    utils::BorrowedPointer<MemoryRegion> _memoryRegion;
+    PinCount _pinCount{};
+    std::vector<uint8_t> _memory;
 };
 } // namespace buffer

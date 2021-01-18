@@ -1,13 +1,14 @@
 #pragma once
 
 #include "buffer/BufferFrame.hpp"
+#include "utility/BorrowedPointer.hpp"
 
 namespace buffer {
 class ZerothPage {
 public:
-    ZerothPage(BufferFrame bufferFrame) : _bufferFrame(std::move(bufferFrame)) {}
+    ZerothPage(utils::BorrowedPointer<BufferFrame> bufferFrame) : _bufferFrame(std::move(bufferFrame)) {}
 
 private:
-    BufferFrame _bufferFrame;
+    utils::BorrowedPointer<BufferFrame> _bufferFrame;
 };
 } // namespace buffer

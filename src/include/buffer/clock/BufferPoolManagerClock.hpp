@@ -1,34 +1,32 @@
 #pragma once
 
 #include "buffer/BufferPoolManager.hpp"
-#include "buffer/MemoryRegion.hpp"
 #include "buffer/clock/BufferFrameClock.hpp"
 #include "diskspace/DiskSpaceManager.hpp"
 
 #include <memory>
 
 namespace buffer {
-class BufferPoolManagerClock : public BufferPoolManager {
+class BufferPoolManagerClock : public BufferPoolManager<EvictPolicy::CLOCK> {
 public:
     BufferPoolManagerClock(std::string_view diskFileName,
                            FrameNum maxFrameNum,
                            FrameBytes frameBytes,
                            utils::BorrowedPointer<diskspace::DiskSpaceManager> diskSpaceManager)
-        : BufferPoolManager(EvictPolicy::CLOCK, diskFileName, maxFrameNum, frameBytes, std::move(diskSpaceManager)) {}
+        : BufferPoolManager(diskFileName, maxFrameNum, frameBytes, std::move(diskSpaceManager)) {}
 
     ~BufferPoolManagerClock();
 
 protected:
-    BufferFrame getBufferFrame(diskspace::BlockId blockId) override;
+    utils::BorrowedPointer<BufferFrame> getBufferFrame(diskspace::BlockId blockId) override;
     void flush() override {
-        flush_();
+        _flush();
     }
+    FrameNum totalFrames() override;
 
 private:
-    std::pair<FrameId, utils::BorrowedPointer<MemoryRegion>> allocateNewMemoryRegion();
-    void flush_();
+    void _flush();
 
-    std::vector<std::unique_ptr<MemoryRegion>> _memoryRegions{};
-    std::unordered_map<diskspace::BlockId, BufferFrameClock> _rawPages{};
+    std::unordered_map<diskspace::BlockId, std::unique_ptr<BufferFrameClock>> _sysPages{};
 };
 } // namespace buffer
