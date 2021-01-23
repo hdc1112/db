@@ -5,11 +5,14 @@ find_package(fmt REQUIRED)
 # git clone git clone https://github.com/google/googletest
 # cd googletest; mkdir build; cd build; cmake ..; make; sudo make install
 find_package(GTest REQUIRED)
-
 include_directories(${GTEST_INCLUDE_DIRS})
 
+# git submodule add https://github.com/gabime/spdlog.git external/spdlog
 add_subdirectory(external/spdlog)
+
+# git submodule add https://github.com/Amanieu/asyncplusplus.git external/asyncplusplus
+add_subdirectory(external/asyncplusplus)
 
 # Export a third-party libraries list
 set(THIRD_PARTY_LIBS)
-list(APPEND THIRD_PARTY_LIBS fmt::fmt ${GTEST_LIBRARIES} spdlog)
+list(APPEND THIRD_PARTY_LIBS fmt::fmt ${GTEST_LIBRARIES} spdlog Async++)

@@ -1,3 +1,6 @@
 [submodule "external/spdlog"]
 	path = external/spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "external/asyncplusplus"]
+	path = external/asyncplusplus
+	url = https://github.com/Amanieu/asyncplusplus.git
