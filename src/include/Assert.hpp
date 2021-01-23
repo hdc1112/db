@@ -2,7 +2,7 @@
 
 #include "BuildFlagsGenerated.hpp"
 
-#include "spdlog/spdlog.h"
+#include "Log.hpp"
 
 #include <cassert>
 

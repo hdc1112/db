@@ -1,11 +1,11 @@
 #include "ErrCode.hpp"
-#include "diskspace/DiskSpaceTypes.hpp"
 #include "SizeTypes.hpp"
+#include "diskspace/DiskSpaceTypes.hpp"
 #include "utility/FileUtility.hpp"
 #include "utility/ScopeGuard.hpp"
 #include "utility/StopWatch.hpp"
 
-#include "spdlog/spdlog.h"
+#include "Log.hpp"
 #include "gtest/gtest.h"
 
 #ifdef __APPLE__

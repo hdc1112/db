@@ -7,7 +7,7 @@
 #include "utility/ScopeGuard.hpp"
 #include "utility/StopWatch.hpp"
 
-#include "spdlog/spdlog.h"
+#include "Log.hpp"
 #include "gtest/gtest.h"
 
 #ifdef __APPLE__

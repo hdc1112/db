@@ -3,8 +3,8 @@
 #include "ErrCode.hpp"
 #include "utility/BorrowedPointer.hpp"
 
+#include "Log.hpp"
 #include "spdlog/fmt/ostr.h"
-#include "spdlog/spdlog.h"
 
 #include <cstdint>
 #include <utility>

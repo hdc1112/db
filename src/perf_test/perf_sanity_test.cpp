@@ -1,6 +1,6 @@
 #include "utility/StopWatch.hpp"
 
-#include "spdlog/spdlog.h"
+#include "Log.hpp"
 #include "gtest/gtest.h"
 
 #include <chrono>

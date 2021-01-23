@@ -4,7 +4,7 @@
 #include "utility/FileUtility.hpp"
 #include "utility/ScopeGuard.hpp"
 
-#include "spdlog/spdlog.h"
+#include "Log.hpp"
 
 #ifdef __APPLE__
 #include <fcntl.h>

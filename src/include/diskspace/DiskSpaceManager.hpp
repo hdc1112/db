@@ -6,7 +6,7 @@
 #include "utility/BlockingQueue.hpp"
 #include "utility/BorrowedPointer.hpp"
 
-#include "spdlog/spdlog.h"
+#include "Log.hpp"
 
 #include <chrono>
 #include <future>

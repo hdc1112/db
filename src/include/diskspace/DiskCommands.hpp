@@ -2,8 +2,7 @@
 
 #include "diskspace/DiskSpaceTypes.hpp"
 
-#include "spdlog/fmt/ostr.h"
-#include "spdlog/spdlog.h"
+#include "Log.hpp"
 
 #include <variant>
 
