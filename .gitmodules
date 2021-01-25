@@ -1,3 +1,6 @@
 [submodule "external/spdlog"]
 	path = external/spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "external/RxCpp"]
+	path = external/RxCpp
+	url = https://github.com/ReactiveX/RxCpp.git
